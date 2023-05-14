@@ -6,10 +6,10 @@ const Input = () => {
     <div className="input">
       <input type="text" placeholder="Type Something" />
       <div className="send">
-        <img src={attach}></img>
+        <img src={attach} alt=""></img>
         <input type="file" style={{ display: "none" }} id="file" />
         <label htmlFor="file">
-          <img src={Img}></img>
+          <img src={Img} alt=""></img>
         </label>
         <button>Send</button>
       </div>

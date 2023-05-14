@@ -15,6 +15,11 @@ const Register = () => {
 
   const navigate = useNavigate();
 
+  const removeErr = ()=>{
+    setErr(false);
+  }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const displayName = e.target[0].value;
@@ -66,7 +71,7 @@ const Register = () => {
       <div className="formWraper">
         <span className="logo">Chat App</span>
         <span className="title">Register</span>
-        <form onSubmit={handleSubmit} method="POST">
+        <form onSubmit={handleSubmit} onChange={removeErr} method="POST">
           <input type="text" placeholder="Name" required />
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Password" required />
@@ -77,7 +82,7 @@ const Register = () => {
           </label>
           <button>Sign Up</button>
         </form>
-        {err && <span>Something went wrong</span>}
+        {err && <span style={{color:"red"}}>Something went wrong</span>}
         <p>Do you have an account? <Link to="/login">Login</Link></p>
       </div>
     </div>

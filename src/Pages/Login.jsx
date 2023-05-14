@@ -7,6 +7,9 @@ const Login = () => {
   const [err, setErr] = useState(false);
   const navigate = useNavigate();
 
+  const removeErr = ()=>{
+    setErr(false);
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
@@ -26,12 +29,12 @@ const Login = () => {
       <div className="formWraper">
         <span className="logo">Chat App</span>
         <span className="title">Login</span>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onChange={removeErr}>
           <input type="email" placeholder="Email" />
           <input type="password" placeholder="Password" />
           <button>Login</button>
         </form>
-        {err && <span>Something went wrong</span>}
+        {err && <span style={{color:"red"}}>Something went wrong</span>}
         <p>Don't have an account ? <Link to="/register">Register</Link></p>
       </div>
     </div>
