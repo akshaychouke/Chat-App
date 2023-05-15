@@ -11,8 +11,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { AuthContext } from "../Context/AuthContext";
-
+import { AuthContext } from "../context/AuthContext";
 const Search = () => {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
@@ -21,71 +20,62 @@ const Search = () => {
   const { currentUser } = useContext(AuthContext);
 
   const handleSearch = async () => {
-    const q = query(collection(db, "users"), where("displayName", "==", username));
+    const q = query(
+      collection(db, "users"),
+      where("displayName", "==", username)
+    );
 
     try {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         setUser(doc.data());
       });
-      setErr(false);
-    } catch (error) {
-      setUser(null);
+    } catch (err) {
       setErr(true);
     }
   };
 
   const handleKey = (e) => {
-    if (e.code === "Enter") {
-      handleSearch();
-    }
+    e.code === "Enter" && handleSearch();
   };
 
   const handleSelect = async () => {
-    // Check whether the chat already exists
+    //check whether the group(chats in firestore) exists, if not create
     const combinedId =
-      currentUser.uid > user.uid ? currentUser.uid + user.uid : user.uid + currentUser.uid;
-
+      currentUser.uid > user.uid
+        ? currentUser.uid + user.uid
+        : user.uid + currentUser.uid;
     try {
-      const chatRef = doc(db, "chats", combinedId);
-      const chatDoc = await getDoc(chatRef);
+      const res = await getDoc(doc(db, "chats", combinedId));
 
-      if (!chatDoc.exists()) {
-        // Create a chat in the "chats" collection
-        await setDoc(chatRef, { messages: [] });
+      if (!res.exists()) {
+        //create a chat in chats collection
+        await setDoc(doc(db, "chats", combinedId), { messages: [] });
 
-        // Add chat info to userChats for current user
+        //create user chats
         await updateDoc(doc(db, "userChats", currentUser.uid), {
-          [combinedId]: {
-            userInfo: {
-              uid: user.uid,
-              displayName: user.displayName,
-              photoURL: user.photoURL,
-            },
-            date: serverTimestamp(),
+          [combinedId + ".userInfo"]: {
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
           },
+          [combinedId + ".date"]: serverTimestamp(),
         });
 
-        // Add chat info to userChats for the other user
         await updateDoc(doc(db, "userChats", user.uid), {
-          [combinedId]: {
-            userInfo: {
-              uid: currentUser.uid,
-              displayName: currentUser.displayName,
-              photoURL: currentUser.photoURL,
-            },
-            date: serverTimestamp(),
+          [combinedId + ".userInfo"]: {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
           },
+          [combinedId + ".date"]: serverTimestamp(),
         });
       }
-    } catch (error) {
-      console.error("Error creating chat:", error);
-    }
+    } catch (err) {}
 
     setUser(null);
-    setUsername("");
+    setUsername("")
   };
-
   return (
     <div className="search">
       <div className="searchForm">
